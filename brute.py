@@ -39,7 +39,7 @@ class Brute:
         client = paramiko.client.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for i in tqdm(self.users):
-            for j in self.passwords:
+            for j in tqdm(self.passwords, leave=False):
                 try:
                     if self.verbose == True:
                         tqdm.write(f"[*] Checking SSH authentication for {i}")
@@ -80,7 +80,7 @@ class Brute:
         print("[*] Beginning LDAP Brute Force: ")
         server = ldap3.Server(self.target)
         for i in tqdm(self.users):
-            for j in self.passwords:
+            for j in tqdm(self.passwords, leave=False):
                 try:
                     if self.verbose == True:
                         tqdm.write(f"[*] Testing LDAP authentication for {i}")
