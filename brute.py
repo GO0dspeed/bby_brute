@@ -38,7 +38,7 @@ class Brute:
         print("[*] Beginning SSH Brute Force: ")
         client = paramiko.client.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        for i in tqdm(self.users):
+        for i in tqdm(self.users, leave=False):
             for j in tqdm(self.passwords, leave=False):
                 try:
                     if self.verbose == True:
@@ -79,7 +79,7 @@ class Brute:
     def _brute_ldap(self):   # Cycle through users and passwords and test LDAP bind
         print("[*] Beginning LDAP Brute Force: ")
         server = ldap3.Server(self.target)
-        for i in tqdm(self.users):
+        for i in tqdm(self.users, leave=False):
             for j in tqdm(self.passwords, leave=False):
                 try:
                     if self.verbose == True:
