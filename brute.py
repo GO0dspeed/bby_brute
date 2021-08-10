@@ -67,9 +67,9 @@ class Brute:
                 finally:
                     try:
                         client.close()
-                        time.sleep(10)
+                        time.sleep(1)
                     except:
-                        time.sleep(10)
+                        time.sleep(1)
                         continue
 
     
