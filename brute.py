@@ -7,6 +7,7 @@ import subprocess
 import ipaddress
 import paramiko
 import time
+from sys import exit
 from tqdm import tqdm
 
 
@@ -48,6 +49,9 @@ class Brute:
                         return
                     else:
                         continue
+                except (paramiko.ssh_exception.NoValidConnectionsError, TimeoutError):
+                    tqdm.write("Target does not appear to be running SSH")
+                    return
                 except paramiko.ssh_exception.AuthenticationException:
                     if self.verbose == True:
                         tqdm.write(f"[*] Logon failed for {i}:{j}")
@@ -61,9 +65,8 @@ class Brute:
                     tqdm.write("Exiting...")
                     exit(0)
                 except Exception as e:
-                    print(e)
-                    tqdm.write("An Error Occured, ensure the host is reachable")
-                    exit(1)
+                    tqdm.write(e)
+                    return
                 finally:
                     try:
                         client.close()
@@ -87,15 +90,18 @@ class Brute:
                         return
                     else:
                         continue
-                except KeyboardInterrupt:
-                    tqdm.write("Exiting...")
-                    exit(0)
+                except ldap3.core.exceptions.LDAPSocketOpenError:
+                    tqdm.write("Target does not appear to be running LDAP")
+                    return
                 except ldap3.core.exceptions.LDAPBindError:
                     if self.verbose == True:
                         tqdm.write(f"[*] Failed logon for {i}:{j}")
-                except:
-                    tqdm.write("An error occured")
-                    exit(1)
+                except KeyboardInterrupt:
+                    tqdm.write("Exiting...")
+                    exit(0)
+                except Exception as e:
+                    tqdm.write(e)
+                    return
 
     def main_loop(self):    # Execute helper functions to brute force            
         self._read_userfile()

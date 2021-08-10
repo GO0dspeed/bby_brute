@@ -1,5 +1,7 @@
-from brute import Brute
 import argparse
+from sys import exit
+from brute import Brute
+
 
 def define_arguemnts():
     parser = argparse.ArgumentParser()
@@ -26,10 +28,8 @@ def main():
         print(f"{parser.print_help()}Error: LDAP selected without a domain provided")
         exit(0)
     action = Brute(args.target, args.userfile, args.passfile, args.type, args.domain, args.verbose, args.quit_on_success)
-    try:
-        action.main_loop()
-    except Exception as e:
-        print(f"An Error Occured\n{e}")
+    action.main_loop()
+
 
 if __name__ == "__main__":
     main()
