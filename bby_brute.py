@@ -9,7 +9,7 @@ def define_arguemnts():
     parser.add_argument("-t", "--type", help="Type of service to brute force", choices=["ssh", "ad", "ssh,ad", "ad,ssh"])
     parser.add_argument("-d", "--domain", help="Domain to use for LDAP", required=False)
     parser.add_argument("-v", "--verbose", help="Verbose output (prints all attempts", action="store_true", required=False)
-    parser.add_argument("--quit-on-success", help="Quit on successful login", required=False)
+    parser.add_argument("-q", "--quit-on-success", help="Quit on successful login", action="store_true", required=False)
     return parser.parse_args()
 
 def main():

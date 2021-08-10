@@ -5,7 +5,8 @@ import ldap3
 import os
 import subprocess
 import ipaddress
-from pexpect import pxssh
+import paramiko
+from tenacity import retry,stop
 from tqdm import tqdm
 
 
@@ -31,22 +32,24 @@ class Brute:
         with open(self.passfile) as fh:
             for i in fh.readlines():
                 self.passwords.append(i.rstrip('\r\n'))
-    
+
+    @retry(stop=stop.stop_after_attempt(15))
     def _brute_ssh(self):    # Cycle through users and passwords and test SSH logon
         print("[*] Beginning SSH Brute Force: ")
+        client = paramiko.client.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for i in tqdm(self.users):
             for j in self.passwords:
                 try:
                     if self.verbose == True:
                         tqdm.write(f"[*] Checking SSH authentication for {i}")
-                    authsesh = pxssh.pxssh(options={"StrictHostKeyChecking": "no"})
-                    authsesh.login(self.target, i, j)
+                    client.connect(self.target, username=j, password=j, banner_timeout=20)
                     tqdm.write(f"[*] Logon successful for {i}:{j}")
                     if self.quit_on_success == True:
-                        break
+                        return
                     else:
                         continue
-                except pxssh.ExceptionPxssh as e:
+                except paramiko.ssh_exception.AuthenticationException:
                     if self.verbose == True:
                         tqdm.write(f"[*] Logon failed for {i}:{j}")
                     else:
@@ -54,9 +57,11 @@ class Brute:
                 except KeyboardInterrupt:
                     tqdm.write("Exiting...")
                     exit(0)
-                except:
-                    tqdm.write("An Error Ocured, ensure the host is reachable")
+                except Exception as e:
+                    print(e)
+                    tqdm.write("An Error Occured, ensure the host is reachable")
                     exit(1)
+                client.close()
     
     def _brute_ldap(self):   # Cycle through users and passwords and test LDAP bind
         print("[*] Beginning LDAP Brute Force: ")
@@ -69,7 +74,7 @@ class Brute:
                     conn = ldap3.Connection(server, f"{i}@{self.domain}", j, auto_bind=True)
                     tqdm.write(f"[*] Logon successful for {i}:{j}")
                     if self.quit_on_success == True:
-                        break
+                        return
                     else:
                         continue
                 except KeyboardInterrupt:
