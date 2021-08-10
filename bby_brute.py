@@ -10,7 +10,7 @@ def define_arguemnts():
     parser.add_argument("-d", "--domain", help="Domain to use for LDAP", required=False)
     parser.add_argument("-v", "--verbose", help="Verbose output (prints all attempts", action="store_true", required=False)
     parser.add_argument("-q", "--quit-on-success", help="Quit on successful login", action="store_true", required=False)
-    return parser.parse_args()
+    return parser,parser.parse_args()
 
 def main():
     print("""
@@ -21,7 +21,10 @@ def main():
      |_____________/ {_]_]_]_] , `
                    `-'
         """)
-    args = define_arguemnts()
+    parser, args = define_arguemnts()
+    if (args.type == "ad" or args.type == "ad,ssh" or args.type == "ssh,ad") and not args.domain:
+        print(f"{parser.print_help()}Error: LDAP selected without a domain provided")
+        exit(0)
     action = Brute(args.target, args.userfile, args.passfile, args.type, args.domain, args.verbose, args.quit_on_success)
     try:
         action.main_loop()

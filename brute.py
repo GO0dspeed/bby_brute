@@ -107,3 +107,6 @@ class Brute:
         elif self.proto == "ssh,ad":
             self._brute_ssh()
             self._brute_ldap()
+        elif self.proto == "ad,ssh":
+            self._brute_ssh()
+            self._brute_ldap()
