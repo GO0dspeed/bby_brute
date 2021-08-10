@@ -3,3 +3,4 @@ ldap3
 tqdm
 pyinstaller
 tenacity
+paramiko
