@@ -43,7 +43,7 @@ class Brute:
                 try:
                     if self.verbose == True:
                         tqdm.write(f"[*] Checking SSH authentication for {i}")
-                    client.connect(self.target, username=j, password=j, banner_timeout=20)
+                    client.connect(self.target, username=i, password=j, banner_timeout=20)
                     tqdm.write(f"[*] Logon successful for {i}:{j}")
                     if self.quit_on_success == True:
                         return
