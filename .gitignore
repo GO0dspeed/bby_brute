@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # Stuff
-*.txt
+*user*.txt
+pass*.txt
+hash.txt

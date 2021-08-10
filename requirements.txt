@@ -1,0 +1,5 @@
+pexpect
+ldap3
+ipaddress
+tqdm
+pyinstaller
